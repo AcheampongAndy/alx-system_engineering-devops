@@ -7,6 +7,24 @@
 sudo apt update
 sudo apt install -y nginx
 
+# Create HTML page
+echo "Hello, World!" | sudo tee /var/www/html/index.html
+
+# Define the redirection configuration
+redir_config="location /redirect_me {\n\treturn 301 https://www.youtube.com/watch?v=QH2-TGUlwu4; \n}"
+
+# Add the redirection configuration to the Nginx default site configuration
+sudo sed -i "/server_name _;/a $redir_config" /etc/nginx/sites-enabled/default
+
+# Create HTML page for custom 404
+echo "Ceci n'est pas une page" | sudo tee /var/www/html/not_found.html
+
+# Define the custom 404 configuration
+not_found_config="error_page 404 /not_found.html;\nlocation = /not_found.html {\n\troot /var/www/html;\n\tinternal;\n}"
+
+# Add the custom 404 configuration to the Nginx default site configuration
+sudo sed -i "/server_name _;/a $not_found_config" /etc/nginx/sites-enabled/default
+
 # Add the custom header to the Nginx configuration
 sudo sed -i '/location \/ {/a \        add_header X-Served-By $hostname;' /etc/nginx/sites-available/default
 
