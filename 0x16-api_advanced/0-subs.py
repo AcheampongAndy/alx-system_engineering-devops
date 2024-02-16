@@ -2,7 +2,6 @@
 """function that returns the number of subscribers for a given subreddit"""
 import requests
 
-
 def number_of_subscribers(subreddit):
     """Gets number of subscribers
        Args:
@@ -10,15 +9,21 @@ def number_of_subscribers(subreddit):
        Returns:
            number of subscribers if valid, 0 otherwise
     """
-    base_url = 'https://api.reddit.com/r/'
-    headers = {'User-Agent': 'my-app/0.0.1'}
-    response = requests.get(
-        '{}{}/about'.format(
-            base_url, subreddit), headers=headers, allow_redirects=False)
-
-    if response.status_code != 200:
+    api_url = f"https://www.reddit.com/r/{subreddit}/about.json"
+    
+    headers = {'User-Agent': 'CustomUserAgent/1.0'}
+    
+    try:
+        response = requests.get(api_url, headers=headers)
+        
+        if response.status_code == 200:
+            data = response.json()
+            subscribers = data['data']['subscribers']
+            
+            return subscribers
+        else:
+            print(f"Error: {response.status_code}")
+            return 0
+    except Exception as e:
+        print(f"Error: {str(e)}")
         return 0
-
-    about_dict = response.json()
-
-    return about_dict['data']['subscribers']
